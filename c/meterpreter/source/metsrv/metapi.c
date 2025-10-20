@@ -5,6 +5,51 @@
 #include "unicode.h"
 #include "winapi.h"
 
+/*.code
+
+;array_call(void* pFunction, unsigned int paramCount, uint64_t* paramaters)
+
+array_call proc
+    pop rax
+    push rcx
+    pop r10; pFunction
+    test rdx,rdx
+    jz exec
+
+    mov rcx, qword ptr [r8]
+    cmp rdx, 2
+    jl exec
+    push rdx
+    pop r11; paramCount
+    mov rdx, qword ptr [r8+8]
+    cmp r11,3
+    jl exec
+    push r8
+    pop r12; parameters
+    mov r8, qword ptr [r12+16]
+    cmp r11,4
+    jl exec
+    mov r9, qword ptr [r12+24]
+    add r12, 24
+    sub r11,4
+push_loop:
+    test r11,r11
+    jz exec
+    push qword ptr [r12+8*r11]
+    dec r11
+    jmp push_loop
+exec:
+    sub rsp,32
+    push rax
+    jmp r10
+
+array_call endp
+
+end
+*/
+
+BYTE array_call[] = { 0x58,0x51,0x41,0x5a,0x48,0x85,0xd2,0x74,0x40,0x49,0x8b,0x08,0x48,0x83,0xfa,0x02,0x7c,0x37,0x52,0x41,0x5b,0x49,0x8b,0x50,0x08,0x49,0x83,0xfb,0x03,0x7c,0x2a,0x41,0x50,0x41,0x5c,0x4d,0x8b,0x44,0x24,0x10,0x49,0x83,0xfb,0x04,0x7c,0x1b,0x4d,0x8b,0x4c,0x24,0x18,0x49,0x83,0xc4,0x18,0x49,0x83,0xeb,0x04,0x4d,0x85,0xdb,0x74,0x09,0x43,0xff,0x34,0xdc,0x49,0xff,0xcb,0xeb,0xf2,0x48,0x83,0xec,0x20,0x50,0x41,0xff,0xe2 };
+
 MetApi api_instance = {
     // PacketApi
     {
@@ -151,8 +196,8 @@ MetApi api_instance = {
     },
     // WinApi
     {
-		// Ntdll
-		{
+        // Ntdll
+        {
             winapi_ntdll_ZwAllocateVirtualMemory,
             winapi_ntdll_ZwOpenProcess,
             winapi_ntdll_ZwWriteVirtualMemory,
@@ -163,58 +208,58 @@ MetApi api_instance = {
             winapi_ntdll_NtQueueApcThread,
             winapi_ntdll_NtOpenThread
         },
-        // Kernel32
-        {
-            // Process and Memory Management
-            winapi_kernel32_WriteProcessMemory,
-            winapi_kernel32_ReadProcessMemory,
-            winapi_kernel32_OpenProcess,
-            winapi_kernel32_VirtualAlloc,
-            winapi_kernel32_VirtualAllocEx,
-            winapi_kernel32_VirtualProtect,
-            winapi_kernel32_VirtualProtectEx,
-            winapi_kernel32_VirtualQuery,
-            winapi_kernel32_VirtualQueryEx,
-            winapi_kernel32_VirtualFree,
-            winapi_kernel32_FlushInstructionCache,
-            // Thread and Synchronization
-            winapi_kernel32_CreateRemoteThread,
-            winapi_kernel32_OpenThread,
-            winapi_kernel32_SuspendThread,
-            winapi_kernel32_ResumeThread,
-            winapi_kernel32_WaitForMultipleObjects,
-            winapi_kernel32_CreateThread,
-            winapi_kernel32_ResetEvent,
-            winapi_kernel32_SetThreadErrorMode,
-            // Handle Management
-            winapi_kernel32_CloseHandle,
-            winapi_kernel32_DuplicateHandle,
-            winapi_kernel32_SetHandleInformation,
-            // Tool-Help Snapshot APIs
-            winapi_kernel32_CreateToolhelp32Snapshot,
-            winapi_kernel32_Thread32First,
-            winapi_kernel32_Thread32Next,
-            // Module/Library Management
-            winapi_kernel32_LoadLibraryA,
-            winapi_kernel32_FreeLibrary,
-            // File and Pipe I/O
-            winapi_kernel32_CreateFileA,
-            winapi_kernel32_WriteFile,
-            winapi_kernel32_CreateNamedPipeA,
-            winapi_kernel32_ConnectNamedPipe,
-            winapi_kernel32_GetOverlappedResult,
-            winapi_kernel32_ReadFile,
-            // Legacy Memory Management
-            winapi_kernel32_LocalFree,
-            winapi_kernel32_GlobalFree
-        }
-    },
-#ifdef DEBUGTRACE
-    // LoggingApi
+    // Kernel32
     {
-        get_logging_context,
-        get_lock,
-    },
+        // Process and Memory Management
+        winapi_kernel32_WriteProcessMemory,
+        winapi_kernel32_ReadProcessMemory,
+        winapi_kernel32_OpenProcess,
+        winapi_kernel32_VirtualAlloc,
+        winapi_kernel32_VirtualAllocEx,
+        winapi_kernel32_VirtualProtect,
+        winapi_kernel32_VirtualProtectEx,
+        winapi_kernel32_VirtualQuery,
+        winapi_kernel32_VirtualQueryEx,
+        winapi_kernel32_VirtualFree,
+        winapi_kernel32_FlushInstructionCache,
+        // Thread and Synchronization
+        winapi_kernel32_CreateRemoteThread,
+        winapi_kernel32_OpenThread,
+        winapi_kernel32_SuspendThread,
+        winapi_kernel32_ResumeThread,
+        winapi_kernel32_WaitForMultipleObjects,
+        winapi_kernel32_CreateThread,
+        winapi_kernel32_ResetEvent,
+        winapi_kernel32_SetThreadErrorMode,
+        // Handle Management
+        winapi_kernel32_CloseHandle,
+        winapi_kernel32_DuplicateHandle,
+        winapi_kernel32_SetHandleInformation,
+        // Tool-Help Snapshot APIs
+        winapi_kernel32_CreateToolhelp32Snapshot,
+        winapi_kernel32_Thread32First,
+        winapi_kernel32_Thread32Next,
+        // Module/Library Management
+        winapi_kernel32_LoadLibraryA,
+        winapi_kernel32_FreeLibrary,
+        // File and Pipe I/O
+        winapi_kernel32_CreateFileA,
+        winapi_kernel32_WriteFile,
+        winapi_kernel32_CreateNamedPipeA,
+        winapi_kernel32_ConnectNamedPipe,
+        winapi_kernel32_GetOverlappedResult,
+        winapi_kernel32_ReadFile,
+        // Legacy Memory Management
+        winapi_kernel32_LocalFree,
+        winapi_kernel32_GlobalFree
+    }
+},
+#ifdef DEBUGTRACE
+// LoggingApi
+{
+    get_logging_context,
+    get_lock,
+},
 #endif
 };
 
